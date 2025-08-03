@@ -56,12 +56,18 @@ export async function saveUserToDB(user: {
 }
 
 export async function signInAccount(user: {email: string; password: string;}) {
+      try {
+    // Logout first to prevent "session already active" issues
+    await account.deleteSession('current');
+  } catch (_) {
+    // Ignore errors (e.g., no session to delete)
+  }
     try {
         const session = await account.createEmailPasswordSession(user.email, user.password);
+        
         return session;
     } catch (error) {
         console.log(error);
-        //return error;
     }
 }
 
@@ -83,4 +89,14 @@ export async function getCurrentUser() {
         return null;
     }
 
+}
+
+export async function signOutAccount() {
+    try {
+        const session = await account.deleteSession("current");
+        return session;
+    }
+    catch (error) {
+        console.log(error);
+    }
 }
